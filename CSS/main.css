@@ -61,6 +61,8 @@
       padding: 12px 20px;
       color: #e74c3c;
       cursor: pointer;
+      display: flex;
+      gap: 4px;
     }
 
 /* User Info */
