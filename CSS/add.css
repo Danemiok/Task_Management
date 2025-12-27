@@ -1,0 +1,264 @@
+/* ===================== ROOT VARIABLES (USED GLOBALLY) ===================== */
+:root {
+    --primary-color: #4a6fa5;        /* main theme color */
+    --secondary-color: #166088;      /* secondary accents */
+    --success-color: #28a745;        /* success / completed */
+    --danger-color: #dc3545;         /* danger / delete / logout */
+    --warning-color: #ffc107;        /* warning / pending */
+    --info-color: #17a2b8;           /* info */
+    --light-color: #f8f9fa;          /* light background */
+    --dark-color: #343a40;           /* text color */
+    --sidebar-bg: #f8f9fa;           /* sidebar background */
+    --sidebar-active: #e9ecef;       /* active menu */
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* card shadow */
+    --transition: all 0.3s ease;     /* smooth animation */
+}
+
+/* ===================== DARK MODE VARIABLES ===================== */
+.dark-mode {
+    --primary-color: #6c8bc7;        /* dark primary */
+    --secondary-color: #2d7cb5;      /* dark secondary */
+    --light-color: #343a40;          /* dark background */
+    --dark-color: #f8f9fa;           /* light text */
+    --sidebar-bg: #2c3e50;           /* dark sidebar */
+    --sidebar-active: #34495e;       /* dark active menu */
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ===================== GLOBAL RESET ===================== */
+* {
+    margin: 0;                       /* remove default margin */
+    padding: 0;                      /* remove default padding */
+    box-sizing: border-box;          /* include padding in size */
+}
+
+/* ===================== BODY STYLE ===================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* font */
+    background-color: #f5f7fa;       /* page background */
+    color: var(--dark-color);        /* text color */
+    transition: var(--transition);   /* smooth mode change */
+}
+
+/* body background in dark mode */
+.dark-mode body {
+    background-color: #212529;
+}
+
+/* remove padding from bootstrap container */
+.container-fluid {
+    padding: 0;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar {
+    background-color: var(--sidebar-bg); /* sidebar bg */
+    min-height: 100vh;                   /* full height */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* right shadow */
+    transition: var(--transition);
+    position: fixed;                     /* fixed sidebar */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0;
+}
+
+/* sidebar header */
+.sidebar-header {
+    padding: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+}
+
+/* sidebar title */
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* sidebar icon spacing */
+.sidebar-header i {
+    margin-right: 10px;
+}
+
+/* sidebar container */
+.sidebar-sticky {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* navigation area */
+.nav {
+    padding: 20px 0;
+    flex-grow: 1;
+}
+
+/* navigation links */
+.nav-link {
+    color: var(--dark-color);
+    padding: 15px 20px;
+    border-left: 4px solid transparent;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+/* hover effect */
+.nav-link:hover {
+    background-color: var(--sidebar-active);
+    border-left-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* active menu */
+.nav-link.active {
+    background-color: var(--sidebar-active);
+    border-left-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* icon spacing */
+.nav-link i {
+    width: 25px;
+    margin-right: 10px;
+}
+
+/* logout button color */
+.logout-btn {
+    color: var(--danger-color) !important;
+}
+
+/* logout hover */
+.logout-btn:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    border-left-color: var(--danger-color) !important;
+}
+
+/* ===================== USER INFO ===================== */
+.user-info {
+    padding: 20px;
+    background-color: rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+/* user info dark mode */
+.dark-mode .user-info {
+    background-color: rgba(255,255,255,0.05);
+    border-top-color: rgba(255,255,255,0.1);
+}
+
+/* user avatar */
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 15px;
+}
+
+/* user name */
+.user-details h6 {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+/* user email / role */
+.user-details small {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* ===================== MAIN CONTENT ===================== */
+main {
+    padding-top: 20px;
+    margin-left: 25%;                 /* space for sidebar */
+    transition: var(--transition);
+}
+
+/* hide pages by default */
+.page {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+/* active page */
+.page.active {
+    display: block;
+}
+
+/* page animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== DASHBOARD CARDS ===================== */
+.stat-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    margin-bottom: 20px;
+}
+
+/* card hover */
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+/* ===================== TASK CARD ===================== */
+.task-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: white;
+}
+
+/* task card dark mode */
+.dark-mode .task-card {
+    background-color: #2c3e50;
+    border-color: #495057;
+}
+
+/* ===================== FORMS ===================== */
+.form-control,
+.form-select {
+    border-radius: 6px;
+    padding: 10px;
+}
+
+/* input focus */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+}
+
+/* ===================== LOGIN PAGE ===================== */
+.login-page {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;            /* sidebar on top */
+        width: 100%;
+    }
+
+    main {
+        margin-left: 0;              /* remove sidebar space */
+    }
+}
