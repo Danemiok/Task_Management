@@ -1,7 +1,11 @@
-    // Simple script to highlight active menu item
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
+const container = document.querySelector('.container');
+const registerBtn = document.querySelector('.register-btn');
+const loginBtn = document.querySelector('.login-btn');
+
+registerBtn.addEventListener('click', () => {
+    container.classList.add('active');
+})
+
+loginBtn.addEventListener('click', () => {
+    container.classList.remove('active');
+})
