@@ -208,6 +208,19 @@ main {
     margin: 10px 0 0;
 }
 
+.page1 {
+    width: 1300px;
+    display: none;
+    animation: fadeIn 0.5s ease;
+    margin-top: 20px;
+    margin-left: 280px;
+}
+
+.page.active {
+    display: block;
+}
+
+
 .total-tasks { border-top: 4px solid var(--primary-color); }
 .completed-tasks { border-top: 4px solid var(--success-color); }
 .pending-tasks { border-top: 4px solid var(--warning-color); }
