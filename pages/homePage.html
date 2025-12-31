@@ -163,70 +163,71 @@
                         </div>
                     </div>
                 </div>
-            </main>
 
+                <div class="page" id="add-task-page">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-plus-circle"></i> Add New Task</h1>
+                    </div>
 
-
-
-            <!-- Add Task Page -->
-            <div class="page page1" id="add-task-page">
-                <div
-                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2" id="add"><i class="fas fa-plus-circle"></i> Add New Task</h1>
-                </div>
-
-                <div class="add-task-form">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="task-form">
-                                <div class="mb-3">
-                                    <label for="task-title" class="form-label">Title *</label>
-                                    <input type="text" class="form-control" id="task-title" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="task-description" class="form-label">Description</label>
-                                    <textarea class="form-control" id="task-description" rows="3"></textarea>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="task-category" class="form-label">Category</label>
-                                        <select class="form-select" id="task-category">
-                                            <option value="Work">Work</option>
-                                            <option value="Personal">Personal</option>
-                                            <option value="Study">Study</option>
-                                            <option value="Health">Health</option>
-                                            <option value="Finance">Finance</option>
-                                            <option value="Other">Other</option>
-                                        </select>
+                    <div class="add-task-form">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="task-form">
+                                    <div class="mb-3">
+                                        <label for="task-title" class="form-label">Title *</label>
+                                        <input type="text" class="form-control" id="task-title" required>
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label for="task-priority" class="form-label">Priority</label>
-                                        <select class="form-select" id="task-priority">
-                                            <option value="Low">Low</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="High">High</option>
-                                        </select>
+                                    <div class="mb-3">
+                                        <label for="task-description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="task-description" rows="3"></textarea>
                                     </div>
-                                </div>
 
-                                <div class="mb-3 date">
-                                        <label for="date">Date:</label>
-                                        <input type="date" name="date" id="date">
-                                </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="task-category" class="form-label">Category</label>
+                                            <select class="form-select" id="task-category">
+                                                <option value="Work">Work</option>
+                                                <option value="Personal">Personal</option>
+                                                <option value="Study">Study</option>
+                                                <option value="Health">Health</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
 
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="button" class="btn btn-secondary me-md-2"
-                                        id="cancel-task">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add Task</button>
-                                </div>
-                            </form>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="task-priority" class="form-label">Priority</label>
+                                            <select class="form-select" id="task-priority">
+                                                <option value="Low">Low</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="High">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="task-due-date" class="form-label">Due Date</label>
+                                        <input type="text" class="form-control" id="task-due-date"
+                                            placeholder="Select date">
+                                    </div>
+
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="button" class="btn btn-secondary me-md-2"
+                                            id="cancel-task">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Add Task</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+
+
+                
+            </main>
         </div>
     </div>
 
