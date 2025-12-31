@@ -172,7 +172,7 @@
             <div class="page page1" id="add-task-page">
                 <div
                     class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2"><i class="fas fa-plus-circle"></i> Add New Task</h1>
+                    <h1 class="h2" id="add"><i class="fas fa-plus-circle"></i> Add New Task</h1>
                 </div>
 
                 <div class="add-task-form">
@@ -212,10 +212,9 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="task-due-date" class="form-label">Due Date</label>
-                                    <input type="text" class="form-control" id="task-due-date"
-                                        placeholder="Select date">
+                                <div class="mb-3 date">
+                                        <label for="date">Date:</label>
+                                        <input type="date" name="date" id="date">
                                 </div>
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -232,7 +231,7 @@
     </div>
 
 
-            <!-- Add Task Modal
+    <!-- Add Task Modal
             <div class="modal fade" id="addTaskModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -267,158 +266,158 @@
 
 
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-                    /* ===============================
-                    USER SETUP
-                    =============================== */
-                    let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            /* ===============================
+            USER SETUP
+            =============================== */
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 
-                    if (!currentUser) {
-                        currentUser = {
-                            id: 1,
-                            username: 'John Doe',
-                            email: 'john@example.com',
-                            createdAt: new Date().toISOString(),
-                            loginCount: 1
-                        };
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    }
+            if (!currentUser) {
+                currentUser = {
+                    id: 1,
+                    username: 'John Doe',
+                    email: 'john@example.com',
+                    createdAt: new Date().toISOString(),
+                    loginCount: 1
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
 
-                    // Update sidebar & welcome text
-                    document.getElementById('sidebarUsername').textContent = currentUser.username;
-                    document.getElementById('sidebarEmail').textContent = currentUser.email;
-                    document.getElementById('welcomeUsername').textContent = currentUser.username;
-                    document.getElementById('sidebarAvatar').textContent = getInitials(currentUser.username);
-                    function getInitials(name) {
-                        return name.split(' ').map(n => n[0].toUpperCase()).join('');
-                    }
+            // Update sidebar & welcome text
+            document.getElementById('sidebarUsername').textContent = currentUser.username;
+            document.getElementById('sidebarEmail').textContent = currentUser.email;
+            document.getElementById('welcomeUsername').textContent = currentUser.username;
+            document.getElementById('sidebarAvatar').textContent = getInitials(currentUser.username);
+            function getInitials(name) {
+                return name.split(' ').map(n => n[0].toUpperCase()).join('');
+            }
 
-                    /* ===============================
-                    TASK STORAGE INIT
-                    =============================== */
-                    if (!localStorage.getItem('taskManagerTasks')) {
-                        localStorage.setItem('taskManagerTasks', JSON.stringify([]));
-                    }
+            /* ===============================
+            TASK STORAGE INIT
+            =============================== */
+            if (!localStorage.getItem('taskManagerTasks')) {
+                localStorage.setItem('taskManagerTasks', JSON.stringify([]));
+            }
 
-                    updateTaskStats(currentUser.id);
+            updateTaskStats(currentUser.id);
 
-                    /* ===============================
-                    LOGOUT
-                    =============================== */
-                    document.getElementById('logoutBtn').addEventListener('click', function () {
-                        localStorage.removeItem('currentUser');
-                        showAlert('info', 'Logged out successfully');
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
-                    });
+            /* ===============================
+            LOGOUT
+            =============================== */
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                localStorage.removeItem('currentUser');
+                showAlert('info', 'Logged out successfully');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            });
 
-                    /* ===============================
-                    ADD SAMPLE TASK
-                    =============================== */
-                    document.getElementById('addSampleTaskBtn').addEventListener('click', function () {
+            /* ===============================
+            ADD SAMPLE TASK
+            =============================== */
+            document.getElementById('addSampleTaskBtn').addEventListener('click', function () {
 
-                        const tasks = JSON.parse(localStorage.getItem('taskManagerTasks'));
+                const tasks = JSON.parse(localStorage.getItem('taskManagerTasks'));
 
-                        const sampleTask = {
-                            id: Date.now(),
-                            userId: currentUser.id,
-                            title: 'Sample Task ' + (tasks.filter(t => t.userId === currentUser.id).length + 1),
-                            description: 'This is a sample task description',
-                            category: 'Personal',
-                            priority: 'Medium',
-                            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                                .toISOString().split('T')[0],
-                            completed: false,
-                            createdAt: new Date().toISOString()
-                        };
+                const sampleTask = {
+                    id: Date.now(),
+                    userId: currentUser.id,
+                    title: 'Sample Task ' + (tasks.filter(t => t.userId === currentUser.id).length + 1),
+                    description: 'This is a sample task description',
+                    category: 'Personal',
+                    priority: 'Medium',
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                        .toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
 
-                        tasks.push(sampleTask);
-                        localStorage.setItem('taskManagerTasks', JSON.stringify(tasks));
+                tasks.push(sampleTask);
+                localStorage.setItem('taskManagerTasks', JSON.stringify(tasks));
 
-                        updateTaskStats(currentUser.id);
-                        showAlert('success', 'Sample task added successfully!');
-                    });
+                updateTaskStats(currentUser.id);
+                showAlert('success', 'Sample task added successfully!');
+            });
 
-                    /* ===============================
-                    VIEW PROFILE
-                    =============================== */
-                    document.getElementById('viewProfileBtn').addEventListener('click', function () {
-                        showAlert(
-                            'info',
-                            `Username: ${currentUser.username}<br>
+            /* ===============================
+            VIEW PROFILE
+            =============================== */
+            document.getElementById('viewProfileBtn').addEventListener('click', function () {
+                showAlert(
+                    'info',
+                    `Username: ${currentUser.username}<br>
                     Email: ${currentUser.email}<br>
                     Created: ${new Date(currentUser.createdAt).toLocaleDateString()}<br>
                     Login Count: ${currentUser.loginCount}`
-                        );
+                );
+            });
+
+            /* ===============================
+            SIDEBAR NAVIGATION
+            =============================== */
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    document.querySelectorAll('.nav-link').forEach(item => {
+                        item.classList.remove('active');
                     });
 
-                    /* ===============================
-                    SIDEBAR NAVIGATION
-                    =============================== */
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.addEventListener('click', function (e) {
-                            e.preventDefault();
+                    this.classList.add('active');
 
-                            document.querySelectorAll('.nav-link').forEach(item => {
-                                item.classList.remove('active');
-                            });
-
-                            this.classList.add('active');
-
-                            const page = this.getAttribute('data-page');
-                            showAlert('info', `Loading ${page.replace('-', ' ')}...`);
-                        });
-                    });
-
-                    /* ===============================
-                    FUNCTIONS
-                    =============================== */
-                    function updateTaskStats(userId) {
-                        const tasks = JSON.parse(localStorage.getItem('taskManagerTasks')) || [];
-                        const userTasks = tasks.filter(task => task.userId === userId);
-
-                        const totalTasks = userTasks.length;
-                        const completedTasks = userTasks.filter(task => task.completed).length;
-                        const pendingTasks = totalTasks - completedTasks;
-
-                        document.getElementById('totalTasks').textContent = totalTasks;
-                        document.getElementById('completedTasks').textContent = completedTasks;
-                        document.getElementById('pendingTasks').textContent = pendingTasks;
-                    }
-
-                    function showAlert(type, message) {
-                        const successAlert = document.getElementById('successAlert');
-                        const errorAlert = document.getElementById('errorAlert');
-
-                        successAlert.classList.add('hidden');
-                        errorAlert.classList.add('hidden');
-
-                        if (type === 'success' || type === 'info') {
-                            successAlert.className = `alert alert-${type}`;
-                            document.getElementById('alertMessage').innerHTML = message;
-                            successAlert.classList.remove('hidden');
-
-                            setTimeout(() => {
-                                successAlert.classList.add('hidden');
-                            }, 3000);
-                        }
-
-                        if (type === 'error') {
-                            document.getElementById('errorMessage').innerHTML = message;
-                            errorAlert.classList.remove('hidden');
-
-                            setTimeout(() => {
-                                errorAlert.classList.add('hidden');
-                            }, 3000);
-                        }
-                    }
-
+                    const page = this.getAttribute('data-page');
+                    showAlert('info', `Loading ${page.replace('-', ' ')}...`);
                 });
-            </script>
+            });
+
+            /* ===============================
+            FUNCTIONS
+            =============================== */
+            function updateTaskStats(userId) {
+                const tasks = JSON.parse(localStorage.getItem('taskManagerTasks')) || [];
+                const userTasks = tasks.filter(task => task.userId === userId);
+
+                const totalTasks = userTasks.length;
+                const completedTasks = userTasks.filter(task => task.completed).length;
+                const pendingTasks = totalTasks - completedTasks;
+
+                document.getElementById('totalTasks').textContent = totalTasks;
+                document.getElementById('completedTasks').textContent = completedTasks;
+                document.getElementById('pendingTasks').textContent = pendingTasks;
+            }
+
+            function showAlert(type, message) {
+                const successAlert = document.getElementById('successAlert');
+                const errorAlert = document.getElementById('errorAlert');
+
+                successAlert.classList.add('hidden');
+                errorAlert.classList.add('hidden');
+
+                if (type === 'success' || type === 'info') {
+                    successAlert.className = `alert alert-${type}`;
+                    document.getElementById('alertMessage').innerHTML = message;
+                    successAlert.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        successAlert.classList.add('hidden');
+                    }, 3000);
+                }
+
+                if (type === 'error') {
+                    document.getElementById('errorMessage').innerHTML = message;
+                    errorAlert.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        errorAlert.classList.add('hidden');
+                    }, 3000);
+                }
+            }
+
+        });
+    </script>
 
 </body>
 

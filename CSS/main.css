@@ -13,6 +13,20 @@
     --transition: all 0.3s ease;
 }
 
+
+/* -------add------ */
+.date{
+width: 100%;
+}
+input[type="date"]{
+width: 30%;
+padding: 5px 15px;
+border-radius: 5px ;
+}
+.add{
+    margin-right: 10px;
+}
+
 .dark-mode {
     --primary-color: #6c8bc7;
     --secondary-color: #2d7cb5;
