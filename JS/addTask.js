@@ -1,51 +1,130 @@
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
+// ../JS/addTask.js
 
-        // Activate nav link
-        document.querySelectorAll('.nav-link').forEach(item => {
-            item.classList.remove('active');
+document.addEventListener("DOMContentLoaded", () => {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // ===== Elements =====
+    const pages = document.querySelectorAll(".page");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    const taskForm = document.getElementById("task-form");
+    const cancelTaskBtn = document.getElementById("cancel-task");
+
+    const totalTasksEl = document.getElementById("total-tasks");
+    const completedTasksEl = document.getElementById("completed-tasks");
+    const pendingTasksEl = document.getElementById("pending-tasks");
+    const upcomingTasksEl = document.getElementById("upcoming-tasks");
+    const recentTasksList = document.getElementById("recent-tasks-list");
+    const currentDateEl = document.getElementById("current-date");
+
+    // ===== Show current date =====
+    if (currentDateEl) {
+        const d = new Date();
+        const formattedDate =
+            d.getFullYear() + "-" +
+            String(d.getMonth() + 1).padStart(2, "0") + "-" +
+            String(d.getDate()).padStart(2, "0");
+        currentDateEl.textContent = formattedDate; // Example: 2025-12-31
+    }
+    // showPage("dashboard");
+
+    // ===== Navigation =====
+    navLinks.forEach(link => {
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            const page = link.dataset.page;
+            showPage(page);
         });
-        this.classList.add('active');
-
-        // Hide all pages
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.remove('active');
-        });
-
-        // Show selected page
-        const pageName = this.getAttribute('data-page');
-        const targetPage = document.getElementById(`${pageName}-page`);
-
-        if (targetPage) {
-            targetPage.classList.add('active');
-        }
     });
-});
 
+    function showPage(page) {
+        pages.forEach(p => p.classList.remove("active"));
+        navLinks.forEach(l => l.classList.remove("active"));
 
-function renderRecentTasks() {
-    const tasks = JSON.parse(localStorage.getItem('taskManagerTasks'));
-    const list = document.getElementById('recent-tasks-list');
+        const targetPage = document.getElementById(page + "-page");
+        const targetLink = document.querySelector(`[data-page="${page}"]`);
 
-    list.innerHTML = '';
-
-    if (tasks.length === 0) {
-        list.innerHTML = '<p class="text-muted">No tasks yet</p>';
-        return;
+        if (targetPage) targetPage.classList.add("active");
+        if (targetLink) targetLink.classList.add("active");
     }
 
-    tasks.slice(-5).reverse().forEach(task => {
-        const item = document.createElement('div');
-        item.className = 'border rounded p-2 mb-2';
+    // ===== Add Task =====
+    if (taskForm) {
+        taskForm.addEventListener("submit", e => {
+            e.preventDefault();
 
-        item.innerHTML = `
-            <strong>${task.title}</strong><br>
-            <small>
-                ${task.category} | ${task.priority} | ${task.dueDate || 'No due date'}
-            </small>
-        `;
+            const task = {
+                id: Date.now(),
+                title: document.getElementById("task-title").value,
+                description: document.getElementById("task-description").value,
+                category: document.getElementById("task-category").value,
+                priority: document.getElementById("task-priority").value,
+                date: document.getElementById("date").value,
+                status: "pending",
+                createdAt: new Date()
+            };
 
-        list.appendChild(item);
-    });
-}
+            tasks.push(task);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+
+            taskForm.reset();
+            updateDashboard();
+            showPage("dashboard");
+        });
+    }
+
+    // ===== Cancel Button =====
+    if (cancelTaskBtn) {
+        cancelTaskBtn.addEventListener("click", () => {
+            showPage("dashboard");
+            taskForm.reset();
+        });
+    }
+    
+    // ===== Dashboard =====
+    function updateDashboard() {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.status === "completed").length;
+        const pending = total - completed;
+
+        const upcoming = tasks.filter(t => {
+            if (!t.date) return false;
+            const due = new Date(t.date);
+            const today = new Date();
+            const diff = (due - today) / (1000 * 60 * 60 * 24);
+            return diff >= 0 && diff <= 3;
+        }).length;
+
+        totalTasksEl.textContent = total;
+        completedTasksEl.textContent = completed;
+        pendingTasksEl.textContent = pending;
+        upcomingTasksEl.textContent = upcoming;
+
+        renderRecentTasks();
+    }
+
+    function renderRecentTasks() {
+        recentTasksList.innerHTML = "";
+
+        if (tasks.length === 0) {
+            recentTasksList.innerHTML = "<p class='text-muted'>No tasks yet</p>";
+            return;
+        }
+
+        tasks.slice(-5).reverse().forEach(task => {
+            const div = document.createElement("div");
+            div.className = "border-bottom py-2";
+            div.innerHTML = `
+                <strong>${task.title}</strong>
+                <div class="small text-muted">
+                    ${task.category} • ${task.priority} • ${new Date(task.createdAt).toLocaleString()}
+                </div>
+            `;
+            recentTasksList.appendChild(div);
+        });
+    }
+
+    // ===== Init =====
+    updateDashboard();
+    showPage("dashboard");
+});
