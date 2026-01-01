@@ -448,7 +448,7 @@
                     </div>
                 </div>
 
-                <!-- ----- Setting Page ----- -->
+                <!-- Settings Page -->
                 <div class="page" id="settings-page">
                     <div
                         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -468,12 +468,70 @@
                                     </div>
                                 </div>
 
-                                
+                                <div class="mb-4">
+                                    <h5>Storage Settings</h5>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="storage-option"
+                                            id="local-storage" checked>
+                                        <label class="form-check-label" for="local-storage">
+                                            Local Storage (Browser)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="storage-option"
+                                            id="firebase-storage">
+                                        <label class="form-check-label" for="firebase-storage">
+                                            Firebase (Cloud)
+                                        </label>
+                                        <small class="text-muted d-block">Note: Firebase requires additional
+                                            setup</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h5>Notification Preferences</h5>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email-notifications"
+                                            checked>
+                                        <label class="form-check-label" for="email-notifications">
+                                            Email Notifications
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="browser-notifications"
+                                            checked>
+                                        <label class="form-check-label" for="browser-notifications">
+                                            Browser Notifications
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="due-date-reminders" checked>
+                                        <label class="form-check-label" for="due-date-reminders">
+                                            Due Date Reminders
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h5>Data Management</h5>
+                                    <button class="btn btn-outline-primary me-2" id="export-data">
+                                        <i class="fas fa-download"></i> Export All Data
+                                    </button>
+                                    <button class="btn btn-outline-danger" id="clear-data">
+                                        <i class="fas fa-trash"></i> Clear All Data
+                                    </button>
+                                    <small class="text-muted d-block mt-2">Warning: Clearing data cannot be
+                                        undone</small>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" id="save-settings">
+                                        <i class="fas fa-save"></i> Save Settings
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                         
                     </div>
-
                 </div>
 
 
