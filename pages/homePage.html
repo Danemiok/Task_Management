@@ -275,6 +275,107 @@
                         </div>
                     </div>
                 </div>
+                                <!-- Filter Tasks Page -->
+                <div class="page" id="filter-page">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-filter"></i> Filter Tasks</h1>
+                    </div>
+
+                    <div class="filter-tasks">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Filter Options</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="filter-completed">
+                                                <label class="form-check-label" for="filter-completed">
+                                                    Completed
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="filter-pending"
+                                                    checked>
+                                                <label class="form-check-label" for="filter-pending">
+                                                    Pending
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Priority</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="filter-high"
+                                                    checked>
+                                                <label class="form-check-label" for="filter-high">
+                                                    High
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="filter-medium"
+                                                    checked>
+                                                <label class="form-check-label" for="filter-medium">
+                                                    Medium
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="filter-low" checked>
+                                                <label class="form-check-label" for="filter-low">
+                                                    Low
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="filter-category" class="form-label">Category</label>
+                                            <select class="form-select" id="filter-category">
+                                                <option value="all">All Categories</option>
+                                                <option value="Work">Work</option>
+                                                <option value="Personal">Personal</option>
+                                                <option value="Study">Study</option>
+                                                <option value="Health">Health</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="filter-due-date" class="form-label">Due Date</label>
+                                            <select class="form-select" id="filter-due-date">
+                                                <option value="all">All Dates</option>
+                                                <option value="today">Today</option>
+                                                <option value="tomorrow">Tomorrow</option>
+                                                <option value="week">This Week</option>
+                                                <option value="overdue">Overdue</option>
+                                                <option value="future">Future</option>
+                                            </select>
+                                        </div>
+
+                                        <button class="btn btn-primary w-100" id="apply-filter">Apply Filter</button>
+                                        <button class="btn btn-secondary w-100 mt-2" id="reset-filter">Reset
+                                            Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Filtered Tasks</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="filtered-tasks-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
