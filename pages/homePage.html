@@ -224,9 +224,57 @@
                     </div>
                 </div>
 
+                <!-- My Tasks Page -->
+                <div class="page" id="my-tasks-page">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-tasks"></i> My Tasks</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="export-tasks">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="my-tasks">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="tasks-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Task Name</th>
+                                                <th>Status</th>
+                                                <th>Category</th>
+                                                <th>Priority</th>
+                                                <th>Due Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tasks-table-body">
+                                            <!-- Tasks will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Categories Page -->
+                <div class="page" id="categories-page">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-folder"></i> Categories</h1>
+                    </div>
 
-                
+                    <div class="categories">
+                        <div class="row" id="categories-container">
+                            <!-- Categories will be populated here -->
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -265,8 +313,8 @@
             </div> -->
 
 
-
-
+    <script src="/JS/category.js"></script>
+    <script src="/JS/myTask.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
