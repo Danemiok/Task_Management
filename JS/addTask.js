@@ -388,3 +388,96 @@ document.addEventListener("DOMContentLoaded", () => {
     showPage("add-task");
     refreshAll();
 });
+
+
+// --------- filter Tasks ---------------
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    const list = document.getElementById("filtered-tasks-list");
+
+    // ===== Helper: get today date =====
+    function getToday() {
+        return new Date().toISOString().split("T")[0];
+    }
+
+    // ===== Render Tasks =====
+    function renderTasks(tasksToRender) {
+        list.innerHTML = "";
+
+        if (tasksToRender.length === 0) {
+            list.innerHTML = `<p class="text-muted">No tasks found</p>`;
+            return;
+        }
+
+        tasksToRender.forEach(task => {
+            const div = document.createElement("div");
+            div.className = "border rounded p-3 mb-2";
+
+            div.innerHTML = `
+                <h6>${task.title}</h6>
+                <small>
+                    Status: <strong>${task.status}</strong><br>
+                    Priority: <strong>${task.priority}</strong><br>
+                    Category: <strong>${task.category}</strong><br>
+                    Due Date: <strong>${task.dueDate}</strong>
+                </small>
+            `;
+
+            list.appendChild(div);
+        });
+    }
+
+    // ===== Apply Filter =====
+    document.getElementById("apply-filter").addEventListener("click", () => {
+        const today = getToday();
+
+        // Status
+        const statusFilter = [];
+        if (document.getElementById("filter-completed").checked) statusFilter.push("completed");
+        if (document.getElementById("filter-pending").checked) statusFilter.push("pending");
+
+        // Priority
+        const priorityFilter = [];
+        if (document.getElementById("filter-high").checked) priorityFilter.push("High");
+        if (document.getElementById("filter-medium").checked) priorityFilter.push("Medium");
+        if (document.getElementById("filter-low").checked) priorityFilter.push("Low");
+
+        // Category & Date
+        const category = document.getElementById("filter-category").value;
+        const dateType = document.getElementById("filter-due-date").value;
+
+        const filteredTasks = tasks.filter(task => {
+            if (statusFilter.length && !statusFilter.includes(task.status)) return false;
+            if (priorityFilter.length && !priorityFilter.includes(task.priority)) return false;
+            if (category !== "all" && task.category !== category) return false;
+
+            if (dateType === "today" && task.dueDate !== today) return false;
+            if (dateType === "overdue" && task.dueDate >= today) return false;
+            if (dateType === "future" && task.dueDate <= today) return false;
+
+            return true;
+        });
+
+        // Optional: sort by due date
+        filteredTasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+        renderTasks(filteredTasks);
+    });
+
+    // ===== Reset Filter =====
+    document.getElementById("reset-filter").addEventListener("click", () => {
+        // Clear all filter inputs
+        document.getElementById("filter-completed").checked = false;
+        document.getElementById("filter-pending").checked = false;
+        document.getElementById("filter-high").checked = false;
+        document.getElementById("filter-medium").checked = false;
+        document.getElementById("filter-low").checked = false;
+        document.getElementById("filter-category").value = "all";
+        document.getElementById("filter-due-date").value = "all";
+
+        // Clear the task list
+        list.innerHTML = "";
+    });
+});
+
