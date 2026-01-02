@@ -481,3 +481,166 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+
+// ------ Analytics------
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // ===== BASIC COUNTS =====
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(t => t.completed).length;
+    const pendingTasks = totalTasks - completedTasks;
+
+    // ===== COMPLETION RATE =====
+    const completionRate = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+    document.getElementById("completion-rate-bar").style.width = completionRate + "%";
+    document.getElementById("completion-rate-text").textContent = completionRate + "%";
+
+    // ===== TASKS PER DAY =====
+    const tasksByDay = {};
+    tasks.forEach(t => {
+        tasksByDay[t.date] = (tasksByDay[t.date] || 0) + 1;
+    });
+
+    const days = Object.keys(tasksByDay).length || 1;
+    document.getElementById("avg-tasks-per-day").textContent =
+        Math.round(totalTasks / days);
+
+    // ===== MOST PRODUCTIVE DAY =====
+    let bestDay = "N/A";
+    let max = 0;
+    for (let day in tasksByDay) {
+        if (tasksByDay[day] > max) {
+            max = tasksByDay[day];
+            bestDay = day;
+        }
+    }
+    document.getElementById("most-productive-day").textContent = bestDay;
+
+    // ===== COMPLETION CHART =====
+    new Chart(document.getElementById("completionChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Completed", "Pending"],
+            datasets: [{
+                data: [completedTasks, pendingTasks]
+            }]
+        }
+    });
+
+    // ===== CATEGORY CHART =====
+    const categoryCount = {};
+    tasks.forEach(t => {
+        categoryCount[t.category] = (categoryCount[t.category] || 0) + 1;
+    });
+
+    new Chart(document.getElementById("categoryChart"), {
+        type: "pie",
+        data: {
+            labels: Object.keys(categoryCount),
+            datasets: [{
+                data: Object.values(categoryCount)
+            }]
+        }
+    });
+
+    // ===== PRIORITY CHART =====
+    const priorityCount = {};
+    tasks.forEach(t => {
+        priorityCount[t.priority] = (priorityCount[t.priority] || 0) + 1;
+    });
+
+    new Chart(document.getElementById("priorityChart"), {
+        type: "bar",
+        data: {
+            labels: Object.keys(priorityCount),
+            datasets: [{
+                data: Object.values(priorityCount)
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+});
+
+
+
+// ---- setting -----
+
+document.addEventListener("DOMContentLoaded", () => {
+    // ===== Elements =====
+    const darkModeToggle = document.getElementById("dark-mode-toggle");
+    const emailNoti = document.getElementById("email-notifications");
+    const browserNoti = document.getElementById("browser-notifications");
+    const dueDateReminders = document.getElementById("due-date-reminders");
+    const saveBtn = document.getElementById("save-settings");
+    const clearBtn = document.getElementById("clear-data");
+    const exportBtn = document.getElementById("export-data");
+
+    // ===== Load Settings =====
+    const settings = JSON.parse(localStorage.getItem("settings")) || {
+        darkMode: false,
+        email: true,
+        browser: true,
+        reminders: true
+    };
+
+    // Apply settings
+    darkModeToggle.checked = settings.darkMode;
+    emailNoti.checked = settings.email;
+    browserNoti.checked = settings.browser;
+    dueDateReminders.checked = settings.reminders;
+
+    if (settings.darkMode) {
+        document.body.classList.add("dark-mode");
+    }
+
+    // ===== Save Settings =====
+    saveBtn.addEventListener("click", () => {
+        const newSettings = {
+            darkMode: darkModeToggle.checked,
+            email: emailNoti.checked,
+            browser: browserNoti.checked,
+            reminders: dueDateReminders.checked
+        };
+
+        localStorage.setItem("settings", JSON.stringify(newSettings));
+
+        document.body.classList.toggle("dark-mode", newSettings.darkMode);
+
+        alert("Settings saved successfully!");
+    });
+
+    // ===== Clear All Data =====
+    clearBtn.addEventListener("click", () => {
+        if (confirm("Are you sure you want to clear all data?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    });
+
+    // ===== Export Data =====
+    exportBtn.addEventListener("click", () => {
+        const data = {
+            settings: JSON.parse(localStorage.getItem("settings")),
+            tasks: JSON.parse(localStorage.getItem("tasks"))
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json"
+        });
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "task-manager-data.json";
+        link.click();
+    });
+});
+
+
+
+
