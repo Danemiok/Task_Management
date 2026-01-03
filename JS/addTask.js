@@ -482,84 +482,92 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ------ Analytics------
+
+// ---- Analytics ------
 
 document.addEventListener("DOMContentLoaded", () => {
     const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    // ===== BASIC COUNTS =====
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(t => t.completed).length;
-    const pendingTasks = totalTasks - completedTasks;
+    // ===== Completion Stats =====
+    const completedTasks = tasks.filter(t => t.completed);
+    const completionRate = tasks.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
-    // ===== COMPLETION RATE =====
-    const completionRate = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
     document.getElementById("completion-rate-bar").style.width = completionRate + "%";
     document.getElementById("completion-rate-text").textContent = completionRate + "%";
 
-    // ===== TASKS PER DAY =====
-    const tasksByDay = {};
-    tasks.forEach(t => {
-        tasksByDay[t.date] = (tasksByDay[t.date] || 0) + 1;
+    // ===== Average Tasks Per Day =====
+    const days = {};
+    tasks.forEach(task => {
+        if (!days[task.date]) days[task.date] = 0;
+        days[task.date]++;
     });
 
-    const days = Object.keys(tasksByDay).length || 1;
-    document.getElementById("avg-tasks-per-day").textContent =
-        Math.round(totalTasks / days);
+    const avgTasks = Object.keys(days).length ? Math.round(tasks.length / Object.keys(days).length) : 0;
+    document.getElementById("avg-tasks-per-day").textContent = avgTasks;
 
-    // ===== MOST PRODUCTIVE DAY =====
-    let bestDay = "N/A";
-    let max = 0;
-    for (let day in tasksByDay) {
-        if (tasksByDay[day] > max) {
-            max = tasksByDay[day];
-            bestDay = day;
+    // ===== Most Productive Day =====
+    let mostProductiveDay = "N/A";
+    let maxTasks = 0;
+    for (let day in days) {
+        if (days[day] > maxTasks) {
+            maxTasks = days[day];
+            mostProductiveDay = day;
         }
     }
-    document.getElementById("most-productive-day").textContent = bestDay;
+    document.getElementById("most-productive-day").textContent = mostProductiveDay;
 
-    // ===== COMPLETION CHART =====
+    // ===== Completion Chart =====
     new Chart(document.getElementById("completionChart"), {
-        type: "doughnut",
+        type: 'doughnut',
         data: {
             labels: ["Completed", "Pending"],
             datasets: [{
-                data: [completedTasks, pendingTasks]
-            }]
-        }
-    });
-
-    // ===== CATEGORY CHART =====
-    const categoryCount = {};
-    tasks.forEach(t => {
-        categoryCount[t.category] = (categoryCount[t.category] || 0) + 1;
-    });
-
-    new Chart(document.getElementById("categoryChart"), {
-        type: "pie",
-        data: {
-            labels: Object.keys(categoryCount),
-            datasets: [{
-                data: Object.values(categoryCount)
-            }]
-        }
-    });
-
-    // ===== PRIORITY CHART =====
-    const priorityCount = {};
-    tasks.forEach(t => {
-        priorityCount[t.priority] = (priorityCount[t.priority] || 0) + 1;
-    });
-
-    new Chart(document.getElementById("priorityChart"), {
-        type: "bar",
-        data: {
-            labels: Object.keys(priorityCount),
-            datasets: [{
-                data: Object.values(priorityCount)
+                data: [completedTasks.length, tasks.length - completedTasks.length],
+                backgroundColor: ["#0d6efd", "#6c757d"]
             }]
         },
         options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // ===== Tasks by Category =====
+    const categoryData = {};
+    tasks.forEach(task => {
+        categoryData[task.category] = (categoryData[task.category] || 0) + 1;
+    });
+
+    new Chart(document.getElementById("categoryChart"), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(categoryData),
+            datasets: [{
+                data: Object.values(categoryData),
+                backgroundColor: ["#0d6efd", "#198754", "#ffc107", "#dc3545", "#0dcaf0"]
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // ===== Tasks by Priority =====
+    const priorityData = {};
+    tasks.forEach(task => {
+        priorityData[task.priority] = (priorityData[task.priority] || 0) + 1;
+    });
+
+    new Chart(document.getElementById("priorityChart"), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(priorityData),
+            datasets: [{
+                data: Object.values(priorityData),
+                backgroundColor: "#0d6efd"
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
             scales: {
                 y: { beginAtZero: true }
             }
@@ -640,6 +648,31 @@ document.addEventListener("DOMContentLoaded", () => {
         link.click();
     });
 });
+
+
+// ----- Dark mode -----
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.getElementById("dark-mode-toggle");
+
+    // Load saved mode
+    if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+        toggle.checked = true;
+    }
+
+    // Toggle dark mode
+    toggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("darkMode", toggle.checked);
+    });
+});
+
+
+
+
+
+
 
 
 

@@ -54,6 +54,21 @@ body {
     background-color: #212529;
 }
 
+
+/* ------ dark mode ------- */
+.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode .card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+
+
+
 .container-fluid {
     padding: 0;
 }
