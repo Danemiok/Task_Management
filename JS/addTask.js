@@ -56,17 +56,30 @@ function showPage(pageId) {
    NAVIGATION
 ========================= */
 document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', function(e) {
+    link.addEventListener('click', function (e) {
         e.preventDefault();
         const pageName = this.getAttribute('data-page');
         showPage(pageName);
     });
 });
 
+// Quick action buttons: View All (sorted by name) and View Analytics
+document.getElementById('view-all-tasks')?.addEventListener('click', function (e) {
+    e.preventDefault();
+    const tasks = getTasks().slice().sort((a, b) => (a.title || '').toString().localeCompare((b.title || '').toString(), undefined, { sensitivity: 'base' }));
+    renderTasks(tasks);
+    showPage('my-tasks');
+});
+
+document.getElementById('view-analytics')?.addEventListener('click', function (e) {
+    e.preventDefault();
+    showPage('analytics');
+});
+
 /* =========================
    ADD / UPDATE TASK
 ========================= */
-document.getElementById("task-form").addEventListener("submit", function(e) {
+document.getElementById("task-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
     const title = document.getElementById("task-title").value.trim();
@@ -102,6 +115,46 @@ document.getElementById("task-form").addEventListener("submit", function(e) {
 });
 
 /* =========================
+   MODAL ADD TASK (quick modal)
+   ========================= */
+document.getElementById("saveTask")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    const title = document.getElementById("taskTitle").value.trim();
+    if (!title) return alert("Task title is required!");
+
+    const description = document.getElementById("taskDesc").value.trim();
+    const category = document.getElementById("taskCategoryModal").value;
+    const priority = document.getElementById("taskPriorityModal").value;
+    const dueDate = document.getElementById("taskDue").value;
+
+    const tasks = getTasks();
+    tasks.push({
+        title,
+        description,
+        category,
+        priority,
+        dueDate,
+        status: "Pending",
+        createdAt: new Date().toISOString()
+    });
+
+    saveTasks(tasks);
+
+    // reset modal form
+    const mf = document.getElementById('taskForm'); if (mf) mf.reset();
+
+    // hide modal
+    const modalEl = document.getElementById('addTaskModal');
+    if (modalEl) {
+        const modalInst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInst.hide();
+    }
+
+    refreshAll();
+    showPage("my-tasks");
+});
+
+/* =========================
    TASK ACTIONS
 ========================= */
 function deleteTask(index) {
@@ -128,7 +181,7 @@ function editTask(index) {
 
 function toggleTaskStatus(index) {
     const tasks = getTasks();
-    tasks[index].status = tasks[index].status === "Pending" ? "Done" : "Pending";
+    tasks[index].status = tasks[index].status === "Pending" ? "Completed" : "Pending";
     saveTasks(tasks);
     refreshAll();
 }
@@ -152,7 +205,7 @@ function renderTasks(tasksList = null) {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${task.title}</td>
-            <td><span class="badge ${task.status === "Done" ? "bg-success" : "bg-warning"}">${task.status}</span></td>
+            <td><span class="badge ${task.status === "Completed" ? "bg-success" : "bg-warning"}">${task.status}</span></td>
             <td><span class="badge ${categoryStyles[task.category] || "bg-secondary"}">${task.category}</span></td>
             <td>${task.priority}</td>
             <td>${task.dueDate || "-"}</td>
@@ -178,51 +231,220 @@ function renderRecentTasks() {
         return;
     }
 
-    tasks.slice(-5).reverse().forEach(task => {
-        const item = document.createElement("div");
-        item.className = "border rounded p-2 mb-2";
-        item.innerHTML = `
-            <strong>${task.title}</strong><br>
-            <small>${task.category} | ${task.priority} | ${task.dueDate || 'No due date'}</small>
-        `;
-        list.appendChild(item);
+    // tasks.slice(-5).reverse().forEach(task => {
+    //     const item = document.createElement("div");
+    //     item.className = "border rounded p-2 mb-2";
+    //     item.innerHTML = `
+    //         <strong>${task.title}</strong><br>
+    //         <small>${task.category} | ${task.priority} | ${task.dueDate || 'No due date'}</small>
+    //     `;
+    //     list.appendChild(item);
+    // });
+    tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task-item d-flex justify-content-between align-items-center border-bottom py-2';
+        taskElement.innerHTML = `
+                    <div>
+                        <strong>${task.title}</strong>
+                        <div class="small text-muted">
+                            <span class="badge bg-${task.priority === 'High' ? 'danger' : task.priority === 'Medium' ? 'warning' : 'success'}">
+                                ${task.priority}
+                            </span>
+                            <span class="ms-2">${task.category}</span>
+                            ${task.dueDate ? `<span class="ms-2"><i class="far fa-calendar"></i> ${task.dueDate}</span>` : ''}
+                        </div>
+                    </div>
+                    <span class="badge ${task.status === "Completed" ? "bg-success" : "bg-warning"}">
+                    ${task.status}
+                    </span>
+
+                `;
+        list.appendChild(taskElement);
     });
 }
 
 function renderCategories() {
-    const container = document.getElementById("categories-container");
+    const container = document.getElementById('categories-container');
     if (!container) return;
     container.innerHTML = "";
 
     const tasks = getTasks();
-    if (tasks.length === 0) {
-        container.innerHTML = `<p class="text-muted text-center">No categories yet</p>`;
+    container.innerHTML = '';
+
+    if (!tasks || tasks.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center">No categories yet</p>';
         return;
     }
+    // Build categories summary from tasks
+    const categories = {};
+    tasks.forEach(task => {
+        const cat = task.category || 'Other';
+        if (!categories[cat]) categories[cat] = { total: 0, completed: 0 };
+        categories[cat].total++;
+        const st = (task.status || '').toString().toLowerCase();
+        if (st === 'Completed' || st === 'completed') categories[cat].completed++;
+    });
+    const categoryColors = {
+        'Work': 'category-work',
+        'Personal': 'category-personal',
+        'Study': 'category-study',
+        'Health': 'category-health',
+        'Finance': 'category-finance',
+        'Other': 'category-other'
+    };
 
-    const categoryCount = {};
-    tasks.forEach(task => categoryCount[task.category] = (categoryCount[task.category] || 0) + 1);
+    // Render category cards using categories and apply styles
+    Object.entries(categories).forEach(([category, data]) => {
+        const total = data.total || 0;
+        const completed = data.completed || 0;
+        const pending = total - completed;
 
-    Object.keys(categoryCount).forEach(category => {
-        const col = document.createElement("div");
-        col.className = "col-md-4 mb-4";
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
         col.innerHTML = `
-            <div class="card text-white ${categoryStyles[category] || "bg-dark"} category-card" onclick="filterByCategory('${category}')">
+            <div class="category-card ${categoryColors[category] || 'category-other'}" data-category="${category}">
                 <div class="card-body text-center">
-                    <h5 class="card-title">${category}</h5>
-                    <p class="display-6">${categoryCount[category]}</p>
-                    <small>Tasks</small>
+                     <h3 class="display-6 mb-1">${total}</h3>
+                     <p><strong>${category}</strong></p>
+                     <p>${completed} completed • ${pending} pending</p>
+                    <small>Click to view tasks</small>
                 </div>
             </div>
         `;
         container.appendChild(col);
     });
+
+    // Add click event to category cards
+    container.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const category = e.currentTarget.dataset.category;
+            filterByCategory(category);
+        });
+    });
 }
 
 function filterByCategory(category) {
-    const tasks = getTasks().filter(t => t.category === category);
-    renderTasks(tasks);
-    showPage("my-tasks");
+    const fc = document.getElementById('filter-category');
+    if (fc) fc.value = category;
+    showPage('filter');
+    applyFilter();
+}
+
+function applyFilter() {
+    let tasks = getTasks();
+    if (!tasks) tasks = [];
+
+    // Status
+    const showCompleted = document.getElementById('filter-completed')?.checked;
+    const showPending = document.getElementById('filter-pending')?.checked;
+
+    tasks = tasks.filter(task => {
+        const st = (task.status || '').toString().toLowerCase();
+        if (!showCompleted && !showPending) return false;
+        if (showCompleted && !showPending) return (st === 'Completed' || st === 'completed');
+        if (!showCompleted && showPending) return (st === 'pending');
+        return true;
+    });
+
+    // Priority
+    const priorities = [];
+    if (document.getElementById('filter-high')?.checked) priorities.push('High');
+    if (document.getElementById('filter-medium')?.checked) priorities.push('Medium');
+    if (document.getElementById('filter-low')?.checked) priorities.push('Low');
+    if (priorities.length > 0) tasks = tasks.filter(t => priorities.includes(t.priority));
+
+    // Category
+    const category = document.getElementById('filter-category')?.value || 'all';
+    if (category !== 'all') tasks = tasks.filter(t => t.category === category);
+
+    // Due date
+    const dueFilter = document.getElementById('filter-due-date')?.value || 'all';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (dueFilter !== 'all') {
+        tasks = tasks.filter(task => {
+            if (!task.dueDate) return false;
+            const dueDate = new Date(task.dueDate);
+            dueDate.setHours(0, 0, 0, 0);
+            switch (dueFilter) {
+                case 'today':
+                    return dueDate.getTime() === today.getTime();
+                case 'tomorrow':
+                    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+                    return dueDate.getTime() === tomorrow.getTime();
+                case 'week':
+                    const nextWeek = new Date(today); nextWeek.setDate(nextWeek.getDate() + 7);
+                    return dueDate >= today && dueDate <= nextWeek;
+                case 'overdue':
+                    return dueDate < today;
+                case 'future':
+                    return dueDate > today;
+                default:
+                    return true;
+            }
+        });
+    }
+
+    displayFilteredTasks(tasks);
+}
+
+function displayFilteredTasks(tasks) {
+    const container = document.getElementById('filtered-tasks-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!tasks || tasks.length === 0) {
+        container.innerHTML = '<p class="text-muted">No tasks match your filters</p>';
+        return;
+    }
+
+    tasks.forEach(task => {
+        const identifier = task.id || task.createdAt;
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task-card mb-2 p-2 border rounded';
+        taskElement.innerHTML = `
+            <div class="task-header d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="task-title fw-bold">${task.title}</div>
+                    ${task.description ? `<div class="task-description small text-muted">${task.description}</div>` : ''}
+                </div>
+                <span class="task-status badge ${task.status === 'completed' || task.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
+                    ${task.status}
+                </span>
+            </div>
+            <div class="task-meta small text-muted mt-2 d-flex gap-3">
+                <span><i class="fas fa-folder me-1"></i>${task.category}</span>
+                <span><i class="fas fa-flag me-1"></i>${task.priority}</span>
+                ${task.dueDate ? `<span><i class="far fa-calendar me-1"></i>${task.dueDate}</span>` : ''}
+            </div>
+            <div class="task-actions mt-2">
+                <button class="btn btn-sm btn-outline-primary edit-task" data-id="${identifier}"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn btn-sm btn-outline-success complete-task" data-id="${identifier}"><i class="fas fa-check"></i> ${task.status === 'completed' || task.status === 'Completed' ? 'Undo' : 'Complete'}</button>
+            </div>
+        `;
+        container.appendChild(taskElement);
+    });
+
+    // Attach listeners for edit/complete buttons
+    container.querySelectorAll('.edit-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const tasksAll = getTasks();
+            const index = tasksAll.findIndex(t => (t.id || t.createdAt) == id);
+            if (index > -1) editTask(index);
+        });
+    });
+
+    container.querySelectorAll('.complete-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const tasksAll = getTasks();
+            const index = tasksAll.findIndex(t => (t.id || t.createdAt) == id);
+            if (index > -1) toggleTaskStatus(index);
+            // refresh the filtered view
+            applyFilter();
+        });
+    });
 }
 
 /* =========================
@@ -232,11 +454,11 @@ function updateTaskStats() {
     const tasks = getTasks();
 
     const total = tasks.length;
-    const completed = tasks.filter(t => t.status === "Done").length;
+    const completed = tasks.filter(t => t.status === "Completed").length;
     const pending = total - completed;
 
     const today = new Date();
-    const upcoming = tasks.filter(t => t.dueDate && new Date(t.dueDate) > today && t.status !== "Done").length;
+    const upcoming = tasks.filter(t => t.dueDate && new Date(t.dueDate) > today && t.status !== "Completed").length;
 
     // Dashboard stats
     ["total-tasks", "completed-tasks", "pending-tasks", "upcoming-tasks"].forEach((id, i) => {
@@ -281,7 +503,7 @@ function renderAnalytics() {
     [completionChart, categoryChart, priorityChart].forEach(chart => chart?.destroy());
 
     // Completion Chart
-    const completed = tasks.filter(t => t.status === "Done").length;
+    const completed = tasks.filter(t => t.status === "Completed").length;
     const pending = tasks.length - completed;
     const ctx1 = document.getElementById("completionChart")?.getContext("2d");
     if (ctx1) {
@@ -355,7 +577,7 @@ document.getElementById("apply-filter")?.addEventListener("click", () => {
     const today = new Date().toISOString().split("T")[0];
 
     const statusFilters = [];
-    if (document.getElementById("filter-completed").checked) statusFilters.push("Done");
+    if (document.getElementById("filter-completed").checked) statusFilters.push("Completed");
     if (document.getElementById("filter-pending").checked) statusFilters.push("Pending");
 
     const priorityFilters = [];
@@ -397,21 +619,55 @@ document.getElementById("apply-filter")?.addEventListener("click", () => {
         list.innerHTML = "<p class='text-muted'>No tasks found</p>";
         return;
     }
+    
 
     filtered.forEach(task => {
-        const div = document.createElement("div");
-        div.className = "border rounded p-3 mb-2";
-        div.innerHTML = `
-            <h6>${task.title}</h6>
-            <small>
-                Status: <strong>${task.status}</strong><br>
-                Priority: <strong>${task.priority}</strong><br>
-                Category: <strong>${task.category}</strong><br>
-                Due: <strong>${task.dueDate || "No due date"}</strong>
-            </small>
+        const identifier = task.id || task.createdAt;
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task-card mb-2 p-2 border rounded';
+        taskElement.innerHTML = `
+            <div class="task-header d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="task-title fw-bold">${task.title}</div>
+                    ${task.description ? `<div class="task-description small text-muted">${task.description}</div>` : ''}
+                </div>
+                <span class="task-status badge ${task.status === 'completed' || task.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
+                    ${task.status}
+                </span>
+            </div>
+            <div class="task-meta small text-muted mt-2 d-flex gap-3">
+                <span><i class="fas fa-folder me-1"></i>${task.category}</span>
+                <span><i class="fas fa-flag me-1"></i>${task.priority}</span>
+                ${task.dueDate ? `<span><i class="far fa-calendar me-1"></i>${task.dueDate}</span>` : ''}
+            </div>
+            <div class="task-actions mt-2">
+                <button class="btn btn-sm btn-outline-primary edit-task" data-id="${identifier}"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn btn-sm btn-outline-success complete-task" data-id="${identifier}"><i class="fas fa-check"></i> ${task.status === 'completed' || task.status === 'Completed' ? 'Undo' : 'Complete'}</button>
+            </div>
         `;
-        list.appendChild(div);
+        list.appendChild(taskElement);
     });
+    // Attach listeners for edit/complete buttons
+    list.querySelectorAll('.edit-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const tasksAll = getTasks();
+            const index = tasksAll.findIndex(t => (t.id || t.createdAt) == id);
+            if (index > -1) editTask(index);
+        });
+    });
+
+    list.querySelectorAll('.complete-task').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const tasksAll = getTasks();
+            const index = tasksAll.findIndex(t => (t.id || t.createdAt) == id);
+            if (index > -1) toggleTaskStatus(index);
+            // refresh the filtered view
+            applyFilter();
+        });
+    });
+
 });
 
 document.getElementById("reset-filter")?.addEventListener("click", () => {
@@ -428,7 +684,7 @@ document.getElementById("reset-filter")?.addEventListener("click", () => {
 /* =========================
    SETTINGS & DARK MODE
 ========================= */
-document.getElementById("dark-mode-toggle")?.addEventListener("change", function() {
+document.getElementById("dark-mode-toggle")?.addEventListener("change", function () {
     const settings = JSON.parse(localStorage.getItem("settings") || "{}");
     if (this.checked) {
         document.body.classList.add("dark-mode");
@@ -532,5 +788,3 @@ document.addEventListener("DOMContentLoaded", () => {
     showPage("dashboard");
     refreshAll();
 });
-
-
