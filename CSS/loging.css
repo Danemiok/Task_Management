@@ -206,6 +206,71 @@ body {
     box-shadow: none;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    min-width: 300px;
+}
+
+#authContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    padding: 20px;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.auth-header {
+    padding: 30px;
+    text-align: center;
+    background: #4e73df;
+    color: white;
+}
+
+.auth-body {
+    padding: 30px;
+}
+
+.auth-form {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.btn-block {
+    width: 100%;
+    padding: 12px;
+}
+
 @media screen and (max-width: 650px) {
     .container {
         height: calc(100vh - 40px);
