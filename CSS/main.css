@@ -254,3 +254,39 @@ main {
 .completed-tasks { border-top: 4px solid var(--success-color); }
 .pending-tasks { border-top: 4px solid var(--warning-color); }
 .upcoming-tasks { border-top: 4px solid var(--info-color); }
+
+/* Category Cards */
+.category-card {
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--card-shadow);
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.category-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.category-card p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.category-work { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.category-personal { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.category-study { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.category-health { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.category-finance { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.category-other { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
