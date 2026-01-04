@@ -20,6 +20,14 @@ const categoryStyles = {
     Finance: "bg-warning",
     Other: "bg-secondary"
 };
+const categoryChartColors = {
+    Work: "#0d6efd",     
+    Study: "#0dcaf0",    
+    Health: "#dc3545",   
+    Finance: "#ffc107",  
+    Personal: "#198754", 
+    Other: "#6c757d"     
+};
 
 /* =========================
    PAGE SWITCHING
@@ -344,23 +352,46 @@ function updateCharts() {
     }
 
     // --- Tasks by Priority ---
+    // --- Tasks by Priority ---
     const priorityCount = {};
-    tasks.forEach(t => priorityCount[t.priority] = (priorityCount[t.priority] || 0) + 1);
+    tasks.forEach(t => {
+        priorityCount[t.priority] = (priorityCount[t.priority] || 0) + 1;
+    });
+
+    const priorityLabels = Object.keys(priorityCount);
     const ctx3 = document.getElementById("priorityChart")?.getContext("2d");
+
     if (ctx3) {
-        if(priorityChart) priorityChart.destroy();
+        if (priorityChart) priorityChart.destroy();
+
         priorityChart = new Chart(ctx3, {
             type: 'bar',
             data: {
-                labels: Object.keys(priorityCount),
+                labels: priorityLabels,
                 datasets: [{
                     label: 'Tasks',
                     data: Object.values(priorityCount),
-                    backgroundColor: "#6f42c1"
+                    backgroundColor: priorityLabels.map(priority => {
+                        if (priority === "High") return "#28a745";   // 🟢 Green
+                        if (priority === "Medium") return "#ffc107"; // 🟡 Yellow
+                        if (priority === "Low") return "#dc3545";    // 🔴 Red
+                        return "#6c757d";
+                    })
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
             }
         });
     }
+
 }
 
 /* =========================
@@ -485,95 +516,95 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ---- Analytics ------
 
-document.addEventListener("DOMContentLoaded", () => {
-    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+// document.addEventListener("DOMContentLoaded", () => {
+//     const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    // ===== Completion Stats =====
-    const completedTasks = tasks.filter(t => t.completed);
-    const completionRate = tasks.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+//     // ===== Completion Stats =====
+//     const completedTasks = tasks.filter(t => t.completed);
+//     const completionRate = tasks.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
-    document.getElementById("completion-rate-bar").style.width = completionRate + "%";
-    document.getElementById("completion-rate-text").textContent = completionRate + "%";
+//     document.getElementById("completion-rate-bar").style.width = completionRate + "%";
+//     document.getElementById("completion-rate-text").textContent = completionRate + "%";
 
-    // ===== Average Tasks Per Day =====
-    const days = {};
-    tasks.forEach(task => {
-        if (!days[task.date]) days[task.date] = 0;
-        days[task.date]++;
-    });
+//     // ===== Average Tasks Per Day =====
+//     const days = {};
+//     tasks.forEach(task => {
+//         if (!days[task.date]) days[task.date] = 0;
+//         days[task.date]++;
+//     });
 
-    const avgTasks = Object.keys(days).length ? Math.round(tasks.length / Object.keys(days).length) : 0;
-    document.getElementById("avg-tasks-per-day").textContent = avgTasks;
+//     const avgTasks = Object.keys(days).length ? Math.round(tasks.length / Object.keys(days).length) : 0;
+//     document.getElementById("avg-tasks-per-day").textContent = avgTasks;
 
-    // ===== Most Productive Day =====
-    let mostProductiveDay = "N/A";
-    let maxTasks = 0;
-    for (let day in days) {
-        if (days[day] > maxTasks) {
-            maxTasks = days[day];
-            mostProductiveDay = day;
-        }
-    }
-    document.getElementById("most-productive-day").textContent = mostProductiveDay;
+//     // ===== Most Productive Day =====
+//     let mostProductiveDay = "N/A";
+//     let maxTasks = 0;
+//     for (let day in days) {
+//         if (days[day] > maxTasks) {
+//             maxTasks = days[day];
+//             mostProductiveDay = day;
+//         }
+//     }
+//     document.getElementById("most-productive-day").textContent = mostProductiveDay;
 
-    // ===== Completion Chart =====
-    new Chart(document.getElementById("completionChart"), {
-        type: 'doughnut',
-        data: {
-            labels: ["Completed", "Pending"],
-            datasets: [{
-                data: [completedTasks.length, tasks.length - completedTasks.length],
-                backgroundColor: ["#0d6efd", "#6c757d"]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
+//     // ===== Completion Chart =====
+//     new Chart(document.getElementById("completionChart"), {
+//         type: 'doughnut',
+//         data: {
+//             labels: ["Completed", "Pending"],
+//             datasets: [{
+//                 data: [completedTasks.length, tasks.length - completedTasks.length],
+//                 backgroundColor: ["#0d6efd", "#6c757d"]
+//             }]
+//         },
+//         options: {
+//             responsive: true,
+//             plugins: { legend: { position: 'bottom' } }
+//         }
+//     });
 
-    // ===== Tasks by Category =====
-    const categoryData = {};
-    tasks.forEach(task => {
-        categoryData[task.category] = (categoryData[task.category] || 0) + 1;
-    });
+//     // ===== Tasks by Category =====
+//     const categoryData = {};
+//     tasks.forEach(task => {
+//         categoryData[task.category] = (categoryData[task.category] || 0) + 1;
+//     });
 
-    new Chart(document.getElementById("categoryChart"), {
-        type: 'pie',
-        data: {
-            labels: Object.keys(categoryData),
-            datasets: [{
-                data: Object.values(categoryData),
-                backgroundColor: ["#0d6efd", "#198754", "#ffc107", "#dc3545", "#0dcaf0"]
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
+//     new Chart(document.getElementById("categoryChart"), {
+//         type: 'pie',
+//         data: {
+//             labels: Object.keys(categoryData),
+//             datasets: [{
+//                 data: Object.values(categoryData),
+//                 backgroundColor: ["#0d6efd", "#198754", "#ffc107", "#dc3545", "#0dcaf0"]
+//             }]
+//         },
+//         options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+//     });
 
-    // ===== Tasks by Priority =====
-    const priorityData = {};
-    tasks.forEach(task => {
-        priorityData[task.priority] = (priorityData[task.priority] || 0) + 1;
-    });
+//     // ===== Tasks by Priority =====
+//     const priorityData = {};
+//     tasks.forEach(task => {
+//         priorityData[task.priority] = (priorityData[task.priority] || 0) + 1;
+//     });
 
-    new Chart(document.getElementById("priorityChart"), {
-        type: 'bar',
-        data: {
-            labels: Object.keys(priorityData),
-            datasets: [{
-                data: Object.values(priorityData),
-                backgroundColor: "#0d6efd"
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-});
+//     new Chart(document.getElementById("priorityChart"), {
+//         type: 'bar',
+//         data: {
+//             labels: Object.keys(priorityData),
+//             datasets: [{
+//                 data: Object.values(priorityData),
+//                 backgroundColor: "#0d6efd"
+//             }]
+//         },
+//         options: {
+//             responsive: true,
+//             plugins: { legend: { display: false } },
+//             scales: {
+//                 y: { beginAtZero: true }
+//             }
+//         }
+//     });
+// });
 
 
 
