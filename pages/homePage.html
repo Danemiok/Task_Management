@@ -45,6 +45,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="board">
+                                <i class="fas fa-columns"></i> Board
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#" data-page="categories">
                                 <i class="fas fa-folder"></i> Categories
                             </a>
@@ -64,11 +69,11 @@
                                 <i class="fas fa-cog"></i> Settings
                             </a>
                         </li>
-                        <!-- <li class="nav-item mt-5">
+                        <li class="nav-item mt-5">
                             <a class="nav-link logout-btn" href="#" id="logout">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a>
-                        </li> -->
+                        </li>
                     </ul>
                     <div class="user-info d-flex align-items-center">
                         <div class="avatar" id="sidebarAvatar">JD</div>
@@ -263,6 +268,40 @@
                                     </table>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Board Page -->
+                <div class="page" id="board-page">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-columns"></i> Board</h1>
+                    </div>
+
+                    <div class="board-grid">
+                        <div class="board-column" data-status="Pending">
+                            <div class="board-column-header">
+                                <span class="dot dot-todo"></span>
+                                <h5>To Do</h5>
+                                <span class="count badge bg-light text-dark" id="todo-count">0</span>
+                            </div>
+                            <div class="board-column-body" id="todo-list"></div>
+                        </div>
+                        <div class="board-column" data-status="In Progress">
+                            <div class="board-column-header">
+                                <span class="dot dot-progress"></span>
+                                <h5>In Progress</h5>
+                                <span class="count badge bg-light text-dark" id="progress-count">0</span>
+                            </div>
+                            <div class="board-column-body" id="progress-list"></div>
+                        </div>
+                        <div class="board-column" data-status="Completed">
+                            <div class="board-column-header">
+                                <span class="dot dot-done"></span>
+                                <h5>Done</h5>
+                                <span class="count badge bg-light text-dark" id="done-count">0</span>
+                            </div>
+                            <div class="board-column-body" id="done-list"></div>
                         </div>
                     </div>
                 </div>
@@ -621,14 +660,8 @@
 
 
             if (!currentUser) {
-                currentUser = {
-                    id: 1,
-                    username: 'John Doe',
-                    email: 'john@example.com',
-                    createdAt: new Date().toISOString(),
-                    loginCount: 1
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                window.location.href = "../index.html";
+                return;
             }
 
             // Update sidebar & welcome text

@@ -50,6 +50,7 @@ function showPage(pageId) {
     if (pageId === "my-tasks") renderTasks();
     if (pageId === "categories") renderCategories();
     if (pageId === "analytics") renderAnalytics();
+    if (pageId === "board") renderBoard();
 }
 
 /* =========================
@@ -74,6 +75,15 @@ document.getElementById('view-all-tasks')?.addEventListener('click', function (e
 document.getElementById('view-analytics')?.addEventListener('click', function (e) {
     e.preventDefault();
     showPage('analytics');
+});
+
+// Logout
+document.getElementById('logout')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('currentUser');
+    // Optionally keep tasks; if you want to clear tasks too, uncomment next line
+    // localStorage.removeItem('tasks');
+    window.location.href = "../index.html";
 });
 
 /* =========================
@@ -181,7 +191,26 @@ function editTask(index) {
 
 function toggleTaskStatus(index) {
     const tasks = getTasks();
-    tasks[index].status = tasks[index].status === "Pending" ? "Completed" : "Pending";
+    const current = tasks[index].status || "Pending";
+    const next = current === "Pending" ? "In Progress" : current === "In Progress" ? "Completed" : "Pending";
+    tasks[index].status = next;
+    saveTasks(tasks);
+    refreshAll();
+}
+
+function setTaskStatus(index, status) {
+    const tasks = getTasks();
+    if (!tasks[index]) return;
+    tasks[index].status = status;
+    saveTasks(tasks);
+    refreshAll();
+}
+
+function setTaskStatusById(identifier, status) {
+    const tasks = getTasks();
+    const idx = tasks.findIndex(t => (t.id || t.createdAt) === identifier);
+    if (idx === -1) return;
+    tasks[idx].status = status;
     saveTasks(tasks);
     refreshAll();
 }
@@ -205,7 +234,7 @@ function renderTasks(tasksList = null) {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${task.title}</td>
-            <td><span class="badge ${task.status === "Completed" ? "bg-success" : "bg-warning"}">${task.status}</span></td>
+            <td><span class="badge ${task.status === "Completed" ? "bg-success" : task.status === "In Progress" ? "bg-info" : "bg-warning"}">${task.status}</span></td>
             <td><span class="badge ${categoryStyles[task.category] || "bg-secondary"}">${task.category}</span></td>
             <td>${task.priority}</td>
             <td>${task.dueDate || "-"}</td>
@@ -260,6 +289,85 @@ function renderRecentTasks() {
 
                 `;
         list.appendChild(taskElement);
+    });
+}
+
+function renderBoard() {
+    const tasks = getTasks();
+    const columns = {
+        "Pending": document.getElementById("todo-list"),
+        "In Progress": document.getElementById("progress-list"),
+        "Completed": document.getElementById("done-list")
+    };
+    Object.values(columns).forEach(col => { if (col) col.innerHTML = ""; });
+
+    const counters = {
+        "Pending": document.getElementById("todo-count"),
+        "In Progress": document.getElementById("progress-count"),
+        "Completed": document.getElementById("done-count")
+    };
+    Object.values(counters).forEach(c => { if (c) c.textContent = "0"; });
+
+    tasks.forEach((task, index) => {
+        const col = columns[task.status] || columns["Pending"];
+        if (!col) return;
+        const identifier = task.id || task.createdAt;
+
+        const card = document.createElement("div");
+        card.className = "board-card";
+        card.setAttribute("draggable", "true");
+        card.dataset.id = identifier;
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-semibold">${task.title}</div>
+                    ${task.description ? `<div class="meta">${task.description}</div>` : ""}
+                    <div class="meta mt-1">
+                        <span class="badge ${categoryStyles[task.category] || "bg-secondary"}">${task.category}</span>
+                        <span class="ms-2">${task.priority}</span>
+                        ${task.dueDate ? `<span class="ms-2"><i class="far fa-calendar"></i> ${task.dueDate}</span>` : ""}
+                    </div>
+                </div>
+                <span class="badge ${task.status === "Completed" ? "bg-success" : task.status === "In Progress" ? "bg-info" : "bg-warning"}">${task.status}</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-sm btn-outline-secondary" onclick="setTaskStatus(${index}, 'Pending')" ${task.status === "Pending" ? "disabled" : ""}>To Do</button>
+                <button class="btn btn-sm btn-outline-info" onclick="setTaskStatus(${index}, 'In Progress')" ${task.status === "In Progress" ? "disabled" : ""}>In Progress</button>
+                <button class="btn btn-sm btn-outline-success" onclick="setTaskStatus(${index}, 'Completed')" ${task.status === "Completed" ? "disabled" : ""}>Done</button>
+                <button class="btn btn-sm btn-link text-decoration-none" onclick="editTask(${index})"><i class="fas fa-edit"></i></button>
+            </div>
+        `;
+        col.appendChild(card);
+
+        // Drag events per card
+        card.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", identifier);
+            e.dataTransfer.effectAllowed = "move";
+        });
+    });
+
+    Object.entries(counters).forEach(([status, el]) => {
+        if (el) {
+            const count = tasks.filter(t => (t.status || "Pending") === status).length;
+            el.textContent = count;
+        }
+    });
+
+    // Attach column drag targets
+    Object.entries(columns).forEach(([status, col]) => {
+        if (!col) return;
+        col.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            col.classList.add("drag-over");
+        });
+        col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+        col.addEventListener("drop", (e) => {
+            e.preventDefault();
+            col.classList.remove("drag-over");
+            const id = e.dataTransfer.getData("text/plain");
+            if (!id) return;
+            setTaskStatusById(id, status);
+        });
     });
 }
 
@@ -408,7 +516,12 @@ function displayFilteredTasks(tasks) {
                     <div class="task-title fw-bold">${task.title}</div>
                     ${task.description ? `<div class="task-description small text-muted">${task.description}</div>` : ''}
                 </div>
-                <span class="task-status badge ${task.status === 'completed' || task.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
+                <span class="task-status badge ${
+                    task.status === 'completed' || task.status === 'Completed'
+                        ? 'bg-success'
+                        : task.status === 'In Progress'
+                            ? 'bg-info'
+                            : 'bg-warning'}">
                     ${task.status}
                 </span>
             </div>
@@ -567,6 +680,7 @@ function refreshAll() {
     renderRecentTasks();
     updateTaskStats();
     renderAnalytics();
+    renderBoard();
 }
 
 /* =========================
